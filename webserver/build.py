@@ -14,7 +14,7 @@ app.secret_key = 'dljsaklqk24e21cjn!Ew@@dsa5'
 
 # change this so that you can connect to your redis server
 # ===============================================
-redis_server = redis.Redis("REDIS_SERVER", decode_responses=True, charset="unicode_escape")
+redis_server = redis.Redis(host="localhost", port=6379, decode_responses=True, charset="unicode_escape")
 # ===============================================
 
 # Translate OSM coordinate (longitude, latitude) to SVG coordinates (x,y).
@@ -42,6 +42,32 @@ def map():
 
 @app.route('/get_drones', methods=['GET'])
 def get_drones():
+    drone_dict = {}
+    
+    drones = redis_server.smembers("drones")
+
+    for drone in drones:
+        drone_info = redis_server.hgetall(drone)
+        
+        if not drone_info:
+            continue
+        
+        status = drone_info["status"]
+        
+        long = float(drone_info["longitude"])
+        lat = float(drone_info["latitude"])
+        x, y = translate((long, lat))
+        
+        drone_dict.update({
+                drone: {
+                "longitude": x,
+                "latitude": y,
+                "status": status
+                }
+            })
+
+    return jsonify(drone_dict)
+
     #=============================================================================================================================================
     # Get the information of all the drones from redis server and update the dictionary `drone_dict' to create the response 
     # drone_dict should have the following format:
@@ -51,8 +77,7 @@ def get_drones():
     #              }
     # use function translate() to covert the coodirnates to svg coordinates
     #=============================================================================================================================================
-    drone_dict = {}
-    return jsonify(drone_dict)
+  
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port='5000')
