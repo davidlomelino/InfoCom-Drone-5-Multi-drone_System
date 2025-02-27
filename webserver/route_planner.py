@@ -35,13 +35,14 @@ def route_planner():
     if from_location is None:
         message = 'Departure address not found, please input a correct address'
         return message
+    
     elif to_location is None:
         message = 'Destination address not found, please input a correct address'
         return message
     else:
         # If the coordinates are found by Nominatim, the coords will need to be sent to a drone that is available
         coords = {'from': (from_location.longitude, from_location.latitude),
-                  'to': (to_location.longitude, to_location.latitude),
+                  'to': (to_location.longitude, to_location.latitude)
                   }
         # ======================================================================
         # Here you need to find an available drone in the database. You need to check the status of the drone, there are two statuses, 'busy' or 'idle', only 'idle' drone is available and can be sent the coords to run the delivery
@@ -50,17 +51,17 @@ def route_planner():
         droneAvailable = None
         
         for drone in drones:
-            droneDATA = redis_server.hgetall(drone)
-            if droneDATA['status'] == 'idle':
+            droneData = redis_server.hgetall(drone)
+            if droneData['status'] == 'idle':
                 droneAvailable = drone
-                coords['current'] = (droneDATA["longitude"], droneDATA["latitude"])['ip'] #något problem med ip här?
+                coords['current'] = (droneData["longitude"], droneData["latitude"]) #något problem med ip här?
                 break
         if droneAvailable == None:
             message = 'No available drone, try later'
         else:
             # 2. Get the IP of available drone
-            drone_IP = droneData = redis_server.hgetall(droneAvailable)['ip']
-            DRONE_URL = 'http://' + drone_IP + ':5000'
+            DRONE_IP = droneData = redis_server.hgetall(droneAvailable)
+            DRONE_URL = 'http://' + DRONE_IP + ':5000'
             send_request(DRONE_URL, coords)
             # 3. Send coords to the URL of the available drone
             message = 'Got address and sent request to the drone'

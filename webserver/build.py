@@ -47,15 +47,15 @@ def get_drones():
     drones = redis_server.smembers("drones")
 
     for drone in drones:
-        drone_info = redis_server.hgetall(drone)
+        droneData = redis_server.hgetall(drone)
         
-        if not drone_info:
+        if not droneData:
             continue
         
-        status = drone_info["status"]
+        status = droneData["status"]
         
-        long = float(drone_info["longitude"])
-        lat = float(drone_info["latitude"])
+        long = float(droneData["longitude"])
+        lat = float(droneData["latitude"])
         x, y = translate((long, lat))
         
         drone_dict.update({

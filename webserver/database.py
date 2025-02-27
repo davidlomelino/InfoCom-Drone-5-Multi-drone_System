@@ -36,7 +36,7 @@ def drone():
         "status": drone_status
         }
     
-    redis_server.hmset(droneID, droneDATA)
+    redis_server.hmset(droneID, droneData)
     return f"Drönare {droneID} uppdaterad i databasen"
 
 
