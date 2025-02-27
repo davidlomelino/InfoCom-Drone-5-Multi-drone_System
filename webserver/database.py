@@ -26,20 +26,35 @@ def drone():
     # Note that you need to store the metioned infomation for all drones in Redis, think carefully how to store them
     # =========================================================================================
     drones = redis_server.smembers('drones')
-    if droneID not in drones:
+    if droneID and droneID not in drones:
         redis_server.sadd('drones', droneID)
         
-    droneDATA = {
-        'ip': droneIP,
-        "longitude": drone_longitude,
-        "latitude": drone_latitude,
-        "status": drone_status
+    droneData = {
+        'id': droneIP,
+        'longitude': drone_longitude,
+        'latitude': drone_latitude,
+        'status': drone_status
         }
     
     redis_server.hmset(droneID, droneData)
-    return f"Drönare {droneID} uppdaterad i databasen"
+    #redis_server.hmset('drones', droneData)
+    #redis_server.sadd('drones', droneData)
+    
+    return 'Get data'
+    #return f"Drönare {droneID} uppdaterad i databasen"
 
-
+    #long1 lat1
+    #lat1 lat2
+    #stat1 stat2
+    #id1 id2
+    
+    #if id == id1
+    #if stat1 == free
+     #   hämta long1 och lat1
+      #  och id1
+        
+    
+        
      # =======================================================================================
     
 
